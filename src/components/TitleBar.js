@@ -1,14 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth, provider } from '../firebase';
+import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function TitleBar() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = () => {
+    signInWithPopup(auth, provider).catch((error) => {
+      console.error("Error during sign-in:", error);
+    });
+  };
+
+  const handleLogout = () => {
+    signOut(auth).catch((error) => {
+      console.error("Error during sign-out:", error);
+    });
+  };
 
   const menuItems = [
     { label: 'Home', icon: '🏠', path: '/' },
     { label: 'Quests', icon: '⚡', path: '/quests' },
     { label: 'Analytics', icon: '📊', path: '/analytics' },
-    { label: 'Account', icon: '👤', path: '/account' }
   ];
 
   return (
@@ -71,6 +96,63 @@ export default function TitleBar() {
               {item.label}
             </button>
           ))}
+          {user ? (
+            <div style={{ position: 'relative' }}>
+              <button
+                className="btn ghost"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px'
+                }}
+                onClick={() => navigate('/account')}
+              >
+                <img src={user.photoURL} alt="User" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+                <span>Account</span>
+              </button>
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                background: 'rgba(15,23,42,0.8)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '8px',
+                padding: '8px',
+                display: 'none'
+              }}>
+                <button
+                  className="btn ghost"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '14px',
+                    width: '100%'
+                  }}
+                  onClick={handleLogout}
+                >
+                  <span>🔒</span>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              className="btn ghost"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '14px'
+              }}
+              onClick={handleLogin}
+            >
+              <span>👤</span>
+              <span>Login</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
