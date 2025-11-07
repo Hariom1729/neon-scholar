@@ -30,7 +30,7 @@ export default function TitleBar() {
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        {/* Logo */}
+        {/* Logo with favicon */}
         <div style={{
           fontSize: '24px',
           fontWeight: '800',
@@ -39,11 +39,15 @@ export default function TitleBar() {
           WebkitTextFillColor: 'transparent',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '10px',
           cursor: 'pointer'
         }} onClick={() => navigate('/')}>
-          <span style={{ fontSize: '28px' }}>⚡</span>
-          ZappLearn
+          <img
+            src="/fevicon.png"
+            alt="ZappLearn"
+            style={{ width: 36, height: 36, borderRadius: 8, boxShadow: '0 6px 18px rgba(155,89,255,0.18)' }}
+          />
+          <span style={{ display: 'inline-block', lineHeight: 1 }}>{'ZappLearn'}</span>
         </div>
 
         {/* Navigation */}
