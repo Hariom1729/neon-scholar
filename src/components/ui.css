@@ -113,5 +113,28 @@
 
 .small-muted { font-size:13px; color: #cfe9ff; opacity:0.9 }
 
+/* AI Teacher Interaction specific styles */
+.prompt-input {
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: var(--neon-2) !important;
+  box-shadow: 0 0 0 2px rgba(126,255,245,0.1);
+}
+
+.response-content {
+  line-height: 1.6;
+  color: #dfe9ff;
+}
+
 /* Responsive */
-@media (max-width: 900px){ .dashboard { grid-template-columns: 1fr; } .npc-avatar{ width:72px; height:72px } .grid-cards{ grid-template-columns: 1fr } }
+@media (max-width: 900px){ 
+  .dashboard { grid-template-columns: 1fr; } 
+  .npc-avatar{ width:72px; height:72px } 
+  .grid-cards{ grid-template-columns: 1fr } 
+}

@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NPCTeacher from './NPCTeacher';
 import QuestCard from './QuestCard';
 import FeedbackModal from './FeedbackModal';
+import StreakCard from './StreakCard';
+import Leaderboard from './Leaderboard';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [lastCompleted, setLastCompleted] = useState(null);
 
@@ -28,14 +32,11 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="header-row">
-        <div>
-          <div className="app-title">Neon Scholar — Story-Based Gamified Learning</div>
-          <div className="subtle small-muted">AI NPC teachers guide students through short story quests.</div>
-        </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div className="feature-pill">✔ Feels like a game</div>
-          <div className="feature-pill">✔ Personalized</div>
-          <div className="feature-pill">✔ Cute AI teachers</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
+
+          <div className="feature-pill" style={{ cursor: 'pointer' }} onClick={() => navigate('/teacher-interaction')}>
+            ✔ Cute AI teachers
+          </div>
         </div>
       </div>
 
@@ -81,9 +82,13 @@ export default function Dashboard() {
             <li>Instant progress visualization</li>
           </ul>
         </div>
+
+        <Leaderboard />
       </div>
 
       <aside className="right-panel">
+        <StreakCard />
+
         <div className="neon-card glow">
           <h4>AI NPCs</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
