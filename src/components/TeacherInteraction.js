@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import './ui.css';
@@ -23,8 +23,8 @@ export default function TeacherInteraction() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const debouncedSubmit = useCallback(
-    debounce(async (currentPrompt) => {
+  const debouncedSubmit = useMemo(
+    () => debounce(async (currentPrompt) => {
       const apiKey = process.env.REACT_APP_DEEPSEEK_API_KEY;
 
       if (!apiKey) {
@@ -37,7 +37,6 @@ export default function TeacherInteraction() {
         const deepseekResponse = await generateDeepSeekResponse(currentPrompt, 'deepseek-chat');
         setResponse(deepseekResponse);
 
-        // Only generate a video if the response was successful
         if (!deepseekResponse.startsWith("An error occurred") && !deepseekResponse.startsWith("Your prompt was blocked")) {
           const generatedVideoUrl = await generateVideo(deepseekResponse);
           setVideoUrl(generatedVideoUrl);
@@ -49,9 +48,17 @@ export default function TeacherInteraction() {
       } finally {
         setIsLoading(false);
       }
-    }, 1000), // Debounce for 1 second to prevent rate-limiting
-    []
+    }, 1000), // Debounce for 1 second
+    [] // Empty dependency array ensures this is created only once
   );
+
+  useEffect(() => {
+    // Cleanup the debounced function on component unmount
+    return () => {
+      debouncedSubmit.cancel();
+    };
+  }, [debouncedSubmit]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

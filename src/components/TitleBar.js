@@ -6,6 +6,7 @@ import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 export default function TitleBar() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -97,7 +98,7 @@ export default function TitleBar() {
             </button>
           ))}
           {user ? (
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative' }} onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
               <button
                 className="btn ghost"
                 style={{
@@ -111,32 +112,34 @@ export default function TitleBar() {
                 <img src={user.photoURL} alt="User" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
                 <span>Account</span>
               </button>
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                background: 'rgba(15,23,42,0.8)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: '8px',
-                padding: '8px',
-                display: 'none'
-              }}>
-                <button
-                  className="btn ghost"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '14px',
-                    width: '100%'
-                  }}
-                  onClick={handleLogout}
-                >
-                  <span>🔒</span>
-                  <span>Logout</span>
-                </button>
-              </div>
+              {showDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  background: 'rgba(15,23,42,0.8)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '8px',
+                  padding: '8px',
+                  display: 'block'
+                }}>
+                  <button
+                    className="btn ghost"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '14px',
+                      width: '100%'
+                    }}
+                    onClick={handleLogout}
+                  >
+                    <span>🔒</span>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <button

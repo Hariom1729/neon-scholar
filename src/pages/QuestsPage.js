@@ -1,76 +1,44 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import Dashboard from '../components/Dashboard';
-import AchievementsFooter from '../components/AchievementsFooter';
-import Leaderboard from '../components/Leaderboard';
-import './QuestsPage.css';
+import QuizGame from '../components/QuizGame';
 
 export default function QuestsPage() {
-  const navigate = useNavigate();
-
-  const handleQuestClick = (quest) => {
-    console.log('Quest clicked:', quest);
-    if (quest.type === 'puzzle') {
-      navigate('/puzzle');
-    } else if (quest.type === 'project') {
-      navigate('/micro-project');
-    } else {
-      navigate(`/quiz?type=${quest.type}${quest.duration ? `&duration=${quest.duration}` : ''}`);
-    }
-  };
-
-  const quests = [
-    {
-      title: "Mini Puzzle — 5 mins",
-      description: "Solve programming puzzles to unlock a badge",
-      type: "puzzle",
-      icon: "🧩",
-      duration: 5
-    },
-    {
-      title: "Micro Project — 12 mins",
-      description: "Create a tiny app using templates",
-      type: "project",
-      icon: "🛠️",
-      duration: 12
-    },
-    {
-      title: "Flash Learning — 3 mins",
-      description: "Quick Q&A for dopamine hits",
-      type: "flash",
-      icon: "⚡",
-      duration: 3
-    },
-    {
-      title: "Game Quests",
-      description: "Play a quiz and earn XP to climb the leaderboard",
-      type: "game",
-      icon: "🎮",
-      route: "/quiz?type=game"
-    }
-  ];
-
+  // The QuizGame component will now generate its own questions from the Gemini API
+  // since we are not passing any initialQuestions prop.
   return (
-    <div>
-      <Dashboard />
-      <div style={{ padding: '20px' }}>
-          <div className="quests-grid">
-          {quests.map((quest, index) => (
-            <div key={index} className="neon-card quest-card" onClick={() => handleQuestClick(quest)}>
-              <div className="quest-header">
-                <span className="quest-icon">{quest.icon}</span>
-                <h3>{quest.title}</h3>
-              </div>
-              <p>{quest.description}</p>
-            </div>
-          ))} 
+    <div className="quests-container">
+      <h1 className="app-title">Daily Quests</h1>
+      <p className="page-description">Complete quests to earn rewards and level up!</p>
+      
+      <div className="neon-card-grid">
+        {/* Flashcard Challenge */}
+        <div className="neon-card-wrapper">
+          <div className="neon-card-glow"></div>
+          <div className="neon-card">
+            <h3>Flashcard Challenge</h3>
+            <p>Test your knowledge with quick-fire questions.</p>
+            <QuizGame type="flash" questionCount={3} />
+          </div>
         </div>
-        <div style={{ marginTop: 24 }}>
-          <Leaderboard />
+
+        {/* Algorithmic Puzzle */}
+        <div className="neon-card-wrapper">
+          <div className="neon-card-glow"></div>
+          <div className="neon-card">
+            <h3>Algorithmic Puzzle</h3>
+            <p>Solve a brain-teasing puzzle.</p>
+            <QuizGame type="puzzle" questionCount={1} />
+          </div>
         </div>
-      </div>
-      <div style={{ marginTop: 24 }}>
-        <AchievementsFooter />
+
+        {/* Mini-Project Scenario */}
+        <div className="neon-card-wrapper">
+          <div className="neon-card-glow"></div>
+          <div className="neon-card">
+            <h3>Mini-Project Scenario</h3>
+            <p>Apply your skills to a real-world problem.</p>
+            <QuizGame type="project" questionCount={1} />
+          </div>
+        </div>
       </div>
     </div>
   );

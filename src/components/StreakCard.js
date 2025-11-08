@@ -13,31 +13,30 @@ export default function StreakCard() {
   const [showReward, setShowReward] = useState(false);
 
   useEffect(() => {
-    // Check if it's a new day
     const today = new Date().toDateString();
+    // Only run this logic if it's a new day
     if (streak.lastLogin !== today) {
-      const newDates = { ...streak.dates };
-      newDates[today] = true;
+      const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toDateString();
+      const isConsecutive = streak.lastLogin === yesterday;
+
+      const newCount = isConsecutive ? streak.count + 1 : 1;
+      const newDates = { ...streak.dates, [today]: true };
 
       const newStreak = {
-        count: streak.lastLogin ?
-          // If last login was yesterday, increment streak
-          (new Date(streak.lastLogin).getTime() + 86400000 >= new Date(today).getTime() ?
-            streak.count + 1 : 1)
-          : 1,
+        count: newCount,
         lastLogin: today,
         dates: newDates
       };
+
       setStreak(newStreak);
       localStorage.setItem('learningStreak', JSON.stringify(newStreak));
 
-      // Show reward animation if streak hits milestones
-      if (newStreak.count > 0 && newStreak.count % 5 === 0) {
+      if (newCount > 0 && newCount % 5 === 0) {
         setShowReward(true);
         setTimeout(() => setShowReward(false), 3000);
       }
     }
-  }, []);
+  }, [streak.count, streak.dates, streak.lastLogin]); // Added dependencies
 
   const rewards = {
     5: '🎉 5-Day Bonus: New Theme Unlocked!',

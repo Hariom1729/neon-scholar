@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const INITIAL_VISIBLE_USERS = 5;
 
@@ -9,16 +7,20 @@ export default function Leaderboard({ currentUser }) {
   const [visibleUsers, setVisibleUsers] = useState(INITIAL_VISIBLE_USERS);
 
   useEffect(() => {
-    const q = query(collection(db, "users"), orderBy("xp", "desc"), orderBy("createdAt", "asc"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const users = [];
-      querySnapshot.forEach((doc) => {
-        users.push({ id: doc.id, ...doc.data() });
-      });
-      setLeaderboardData(users);
-    });
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/users');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const users = await response.json();
+        setLeaderboardData(users);
+      } catch (error) {
+        console.error('Error fetching leaderboard data:', error);
+      }
+    };
 
-    return () => unsubscribe();
+    fetchUsers();
   }, []);
 
   const showAllUsers = () => {
@@ -55,17 +57,17 @@ export default function Leaderboard({ currentUser }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {leaderboardData.slice(0, visibleUsers).map((user, index) => (
           <div
-            key={user.id}
+            key={user._id} 
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
               padding: '8px 12px',
-              background: user.id === currentUserId ?
+              background: user._id === currentUserId ? 
                 'linear-gradient(90deg, rgba(155,89,255,0.1), rgba(255,110,199,0.05))' :
                 'rgba(255,255,255,0.03)',
               borderRadius: '12px',
-              border: user.id === currentUserId ?
+              border: user._id === currentUserId ? 
                 '1px solid rgba(155,89,255,0.2)' :
                 '1px solid rgba(255,255,255,0.06)',
               transition: 'all 0.3s ease'
@@ -83,7 +85,7 @@ export default function Leaderboard({ currentUser }) {
             {/* Name and streak */}
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: '600' }}>{user.name}</div>
-              <div className="small-muted">🔥 {user.streak} day streak</div>
+              <div className="small-muted">🔥 {user.streak || 0} day streak</div>
             </div>
 
             {/* XP */}

@@ -1,50 +1,32 @@
 import React, { useState } from 'react';
-import { auth, db } from '../firebase';
-import { doc, runTransaction } from 'firebase/firestore';
+import QuizGame from './QuizGame'; // Import the new QuizGame component
 
-export default function QuestCard({ title, desc, onComplete, questions }) {
-  const [openPuzzle, setOpenPuzzle] = useState(false);
-  const [answered, setAnswered] = useState({});
-  const [feedback, setFeedback] = useState(null);
+export default function QuestCard({ title, desc, xp, onComplete, quizType, quizQuestions }) {
+  const [isQuizActive, setIsQuizActive] = useState(false);
 
-  async function handleChoice(q, idx) {
-    if (answered[q.id]) return; // already answered
-    const correct = idx === q.answerIndex;
-
-    if (correct) {
-      setFeedback({ type: 'success', text: `Nice! +${q.xp} XP 🎉` });
-      setAnswered(prev => ({ ...prev, [q.id]: true }));
-
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        try {
-          await runTransaction(db, async (transaction) => {
-            const userDoc = await transaction.get(userRef);
-            if (!userDoc.exists()) {
-              // This case should ideally not happen if user is logged in
-              // as App.js creates the user doc.
-              return;
-            }
-            const currentXp = userDoc.data().xp || 0;
-            const newXp = currentXp + q.xp;
-            transaction.update(userRef, { xp: newXp });
-          });
-        } catch (error) {
-          console.error("Failed to update XP:", error);
-          // Optionally, set an error feedback state here
-        }
-      }
-
-      // notify parent quest completion for reward UI
+  const handleQuizComplete = (score) => {
+    console.log(`Quiz finished with score: ${score}`);
+    if (score > 0) {
+      // You can add more logic here, like giving XP based on the score
       if (typeof onComplete === 'function') {
-        onComplete({ title });
+        onComplete({ title, xp, score });
       }
-    } else {
-      setFeedback({ type: 'error', text: 'Not quite — try again.' });
     }
-    // clear feedback after a short delay
-    setTimeout(() => setFeedback(null), 1800);
+    // Reset state
+    setIsQuizActive(false);
+  };
+
+  // A quest is a quiz if it has a quizType or pre-defined questions
+  const isQuizQuest = quizType || (quizQuestions && quizQuestions.length > 0);
+
+  if (isQuizActive) {
+    return (
+      <QuizGame 
+        type={quizType} 
+        questions={quizQuestions}
+        onGameComplete={handleQuizComplete} 
+      />
+    );
   }
 
   return (
@@ -52,42 +34,16 @@ export default function QuestCard({ title, desc, onComplete, questions }) {
       <h4>{title}</h4>
       <p>{desc}</p>
 
-      {questions && questions.length > 0 ? (
-        <div className="puzzle-area">
-          {!openPuzzle ? (
-            <div className="actions">
-              <button className="btn primary" onClick={() => setOpenPuzzle(true)}>Start Puzzle 🧩</button>
-              <button className="btn ghost" onClick={() => setOpenPuzzle(false)}>Later ⏳</button>
-            </div>
-          ) : (
-            <div>
-              {questions.map(q => (
-                <div key={q.id} style={{ marginBottom: 12 }}>
-                  <div style={{ fontWeight: 600 }}>{q.prompt}</div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-                    {q.choices.map((c, i) => (
-                      <button key={i} className={`btn ${answered[q.id] ? 'ghost' : 'primary'}`} onClick={() => handleChoice(q, i)} disabled={!!answered[q.id]}>
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn ghost" onClick={() => setOpenPuzzle(false)}>Close</button>
-              </div>
-            </div>
-          )}
-          {feedback && (
-            <div style={{ marginTop: 8 }} className={feedback.type === 'success' ? 'small-muted' : 'error-text'}>{feedback.text}</div>
-          )}
-        </div>
-      ) : (
-        <div className="actions">
-          <button className="btn primary" onClick={onComplete}>Complete ✅</button>
-          <button className="btn ghost">Later ⏳</button>
-        </div>
-      )}
+      <div className="actions">
+        {isQuizQuest ? (
+          <button className="btn primary" onClick={() => setIsQuizActive(true)}>Start Quest ⚡️</button>
+        ) : (
+          <button className="btn primary" onClick={() => onComplete({ title, xp })}>Complete ✅</button>
+        )}
+        <button className="btn ghost">Later ⏳</button>
+      </div>
+      
+      {xp && <div className="xp-badge">+{xp} XP</div>}
     </div>
   );
 }

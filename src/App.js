@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { auth, db } from './firebase';
+import { auth } from './firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import './App.css';
 import './components/ui.css';
 import Dashboard from './components/Dashboard';
@@ -22,63 +21,14 @@ import TitleBar from './components/TitleBar';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [showNamePrompt, setShowNamePrompt] = useState(false);
-  const [username, setUsername] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-          setShowNamePrompt(true);
-        } else {
-          setCurrentUser({ ...user, ...userDoc.data() });
-        }
-      } else {
-        setCurrentUser(null);
-      }
+    // Simplified auth state listener
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
     });
     return () => unsubscribe();
   }, []);
-
-  const handleNameSubmit = async (e) => {
-    e.preventDefault();
-    if (username.trim() && auth.currentUser) {
-      const userRef = doc(db, 'users', auth.currentUser.uid);
-      await setDoc(userRef, {
-        name: username,
-        xp: 0,
-        streak: 0,
-        avatar: auth.currentUser.photoURL || '👨‍🎓',
-        createdAt: serverTimestamp()
-      });
-      const userDoc = await getDoc(userRef);
-      setCurrentUser({ ...auth.currentUser, ...userDoc.data() });
-      setShowNamePrompt(false);
-    }
-  };
-
-  if (showNamePrompt) {
-    return (
-      <div className='centered-view'>
-        <div className='neon-card'>
-          <h2>Welcome!</h2>
-          <p>Please enter your name to continue.</p>
-          <form onSubmit={handleNameSubmit}>
-            <input
-              type="text"
-              className='neon-input'
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your Name"
-            />
-            <button type="submit" className='neon-button'>Submit</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <BrowserRouter>
@@ -86,11 +36,11 @@ function App() {
         <TitleBar />
         <div style={{ paddingTop: '80px' }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard currentUser={currentUser} />} />
             <Route path="/teacher-interaction" element={<TeacherInteraction />} />
             <Route path="/quests" element={<QuestsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/account" element={<AccountPage />} />
+            <Route path="/account" element={<AccountPage currentUser={currentUser} />} />
             <Route path="/teacher-types" element={<TeacherTypesPage />} />
             <Route path="/math-mentor" element={<MathMentorPage />} />
             <Route path="/story-guide" element={<StoryGuidePage />} />
