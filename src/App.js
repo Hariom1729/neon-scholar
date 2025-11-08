@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import TeacherInteraction from './components/TeacherInteraction';
 import QuestsPage from './pages/QuestsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import AccountPage from './pages/AccountPage'; // Import AccountPage
 import TeacherTypesPage from './pages/TeacherTypesPage';
 import MathMentorPage from './pages/MathMentorPage';
 import StoryGuidePage from './pages/StoryGuidePage';
@@ -27,6 +28,7 @@ function App() {
             <Route path="/teacher-interaction" element={<TeacherInteraction />} />
             <Route path="/quests" element={<QuestsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/account" element={<AccountPage />} /> {/* Add account route */}
             <Route path="/teacher-types" element={<TeacherTypesPage />} />
             <Route path="/math-mentor" element={<MathMentorPage />} />
             <Route path="/story-guide" element={<StoryGuidePage />} />
