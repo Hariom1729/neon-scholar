@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-export default function Leaderboard({ leaderboardData = [], currentUserId = '1' }) {
+const INITIAL_VISIBLE_USERS = 5;
+
+export default function Leaderboard({ currentUser }) {
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [visibleUsers, setVisibleUsers] = useState(INITIAL_VISIBLE_USERS);
+
+  useEffect(() => {
+    const q = query(collection(db, "users"), orderBy("xp", "desc"), orderBy("createdAt", "asc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      setLeaderboardData(users);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const showAllUsers = () => {
+    setVisibleUsers(leaderboardData.length);
+  };
 
   const getRankStyle = (index) => {
     switch (index) {
@@ -20,14 +43,17 @@ export default function Leaderboard({ leaderboardData = [], currentUserId = '1' 
     }
   };
 
+  const currentUserId = currentUser ? currentUser.uid : null;
+
   return (
     <div className="neon-card glow">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <h4 style={{ margin: 0 }}>Live Leaderboard</h4>
+        <div className="small-muted">Updates in real-time</div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {leaderboardData.map((user, index) => (
+        {leaderboardData.slice(0, visibleUsers).map((user, index) => (
           <div
             key={user.id}
             style={{
@@ -54,20 +80,6 @@ export default function Leaderboard({ leaderboardData = [], currentUserId = '1' 
               {getPositionEmoji(index) || `#${index + 1}`}
             </div>
 
-            {/* Avatar */}
-            <div style={{
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'linear-gradient(135deg, var(--neon-1), var(--neon-2))',
-              borderRadius: '8px',
-              fontSize: '20px'
-            }}>
-              {user.avatar}
-            </div>
-
             {/* Name and streak */}
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: '600' }}>{user.name}</div>
@@ -90,13 +102,15 @@ export default function Leaderboard({ leaderboardData = [], currentUserId = '1' 
       </div>
 
       {/* View All Button */}
-      <button
-        className="btn ghost"
-        style={{ width: '100%', marginTop: '12px' }}
-        onClick={() => alert('Full leaderboard coming soon!')}
-      >
-        View Full Rankings 🏆
-      </button>
+      {leaderboardData.length > visibleUsers && (
+        <button
+          className="btn ghost"
+          style={{ width: '100%', marginTop: '12px' }}
+          onClick={showAllUsers}
+        >
+          View Full Rankings 🏆
+        </button>
+      )}
     </div>
   );
 }

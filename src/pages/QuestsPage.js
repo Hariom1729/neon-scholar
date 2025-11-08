@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Dashboard from '../components/Dashboard';
 import AchievementsFooter from '../components/AchievementsFooter';
@@ -7,13 +7,6 @@ import './QuestsPage.css';
 
 export default function QuestsPage() {
   const navigate = useNavigate();
-  const [leaderboardData, setLeaderboardData] = useState([
-    { id: '1', name: 'Alex', xp: 420, streak: 7, avatar: '👨‍🎓' },
-    { id: '2', name: 'Maria', xp: 385, streak: 5, avatar: '👩‍🎓' },
-    { id: '3', name: 'James', xp: 350, streak: 4, avatar: '👨‍🎓' },
-    { id: '4', name: 'Sarah', xp: 325, streak: 3, avatar: '👩‍🎓' },
-    { id: '5', name: 'Mike', xp: 310, streak: 2, avatar: '👨‍🎓' }
-  ]);
 
   const handleQuestClick = (quest) => {
     console.log('Quest clicked:', quest);
@@ -73,7 +66,7 @@ export default function QuestsPage() {
           ))} 
         </div>
         <div style={{ marginTop: 24 }}>
-          <Leaderboard leaderboardData={leaderboardData} />
+          <Leaderboard />
         </div>
       </div>
       <div style={{ marginTop: 24 }}>

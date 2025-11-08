@@ -1,19 +1,45 @@
 import React, { useState } from 'react';
+import { auth, db } from '../firebase';
+import { doc, runTransaction } from 'firebase/firestore';
 
-export default function QuestCard({ title, desc, onComplete, questions, addXp }) {
+export default function QuestCard({ title, desc, onComplete, questions }) {
   const [openPuzzle, setOpenPuzzle] = useState(false);
   const [answered, setAnswered] = useState({});
   const [feedback, setFeedback] = useState(null);
 
-  function handleChoice(q, idx) {
+  async function handleChoice(q, idx) {
     if (answered[q.id]) return; // already answered
     const correct = idx === q.answerIndex;
+
     if (correct) {
       setFeedback({ type: 'success', text: `Nice! +${q.xp} XP 🎉` });
       setAnswered(prev => ({ ...prev, [q.id]: true }));
-      if (typeof addXp === 'function') addXp(q.xp);
+
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          await runTransaction(db, async (transaction) => {
+            const userDoc = await transaction.get(userRef);
+            if (!userDoc.exists()) {
+              // This case should ideally not happen if user is logged in
+              // as App.js creates the user doc.
+              return;
+            }
+            const currentXp = userDoc.data().xp || 0;
+            const newXp = currentXp + q.xp;
+            transaction.update(userRef, { xp: newXp });
+          });
+        } catch (error) {
+          console.error("Failed to update XP:", error);
+          // Optionally, set an error feedback state here
+        }
+      }
+
       // notify parent quest completion for reward UI
-      if (typeof onComplete === 'function') onComplete({ title });
+      if (typeof onComplete === 'function') {
+        onComplete({ title });
+      }
     } else {
       setFeedback({ type: 'error', text: 'Not quite — try again.' });
     }
