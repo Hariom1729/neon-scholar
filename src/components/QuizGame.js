@@ -1,37 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { generateDeepSeekResponse } from '../utils/deepseek';
+import { generateGeminiResponse } from '../utils/gemini';
+import './QuizGame.css';
 
-export default function QuizGame({ questionCount = 5, type = 'game', duration, onGameComplete }) {
+const QuizGame = ({ questionCount, type, initialQuestions }) => {
   const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showScore, setShowScore] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(duration ? duration * 60 : null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const generateQuestions = async () => {
+      if (initialQuestions) {
+        setQuestions(initialQuestions);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         let prompt;
         switch (type) {
           case 'puzzle':
-            prompt = `Generate ${questionCount} algorithmic puzzle questions about programming. Each puzzle should be a small coding challenge or logic puzzle. Format the response as a JSON array where each object has: question (string), options (array of 4 strings), answer (string matching one of the options exactly), and explanation (string explaining the solution).`;
+            prompt = `Generate ${questionCount} algorithmic puzzle questions about programming. The response MUST be a JSON array where each object has: "question" (string), "options" (array of 4 strings), "answer" (string matching one of the options exactly), and "explanation" (string). Do not include any other text or formatting.`;
             break;
           case 'project':
-            prompt = `Generate ${questionCount} mini-project scenario questions where each question presents a small coding project scenario and asks about the best approach/solution. Format as JSON array with: question (string describing the project scenario), options (array of 4 possible approaches), answer (string matching the best approach), and explanation (string explaining why it's the best choice).`;
+            prompt = `Generate ${questionCount} mini-project scenario questions. The response MUST be a JSON array where each object has: "question" (string), "options" (array of 4 strings), "answer" (string), and "explanation" (string).`;
             break;
           case 'flash':
-            prompt = `Generate ${questionCount} quick, focused questions about programming fundamentals for rapid learning. Make them direct and concise. Format as JSON array with: question (string), options (array of 4 short answers), answer (string matching correct option), and fact (string with a brief interesting fact related to the answer).`;
+            prompt = `Generate ${questionCount} flashcard-style questions about general knowledge. The response MUST be a JSON array where each object has: "question" (string), "options" (array of 4 strings), "answer" (string), and "explanation" (string).`;
+            break;
+          case 'game':
+            prompt = `Generate ${questionCount} programming quiz questions. The questions can cover topics like data structures, algorithms, and language features. The response MUST be a JSON array where each object has: "question" (string), "options" (array of 4 strings), "answer" (string), and "explanation" (string). Do not include any other text or formatting.`;
             break;
           default:
-            prompt = `Generate ${questionCount} multiple choice questions about programming concepts. Format the response as a JSON array where each object has: question (string), options (array of 4 strings), and answer (string matching one of the options exactly). Make questions engaging and fun.`;
+            prompt = `Generate 1 general knowledge quiz question.`;
         }
-        const response = await generateDeepSeekResponse(prompt, 'deepseek-chat');
-        const parsedQuestions = JSON.parse(response);
+
+        const responseText = await generateGeminiResponse(prompt);
+        
+        // Robust JSON parsing: find the JSON block and extract it
+        const jsonMatch = responseText.match(/\n*```json\n([\s\S]*?)\n```|([\s\S]*)/);
+        const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[2]).trim() : '';
+
+        if (!jsonString) {
+          throw new Error('No valid JSON content found in the API response.');
+        }
+
+        const parsedQuestions = JSON.parse(jsonString);
         setQuestions(parsedQuestions);
-        setLoading(false);
       } catch (error) {
+        console.error('Error generating or parsing questions:', error);
+        setQuestions([{
+          question: `Error: Could not generate questions. Please check the API key and network. Details: ${error.message}`,
+          options: ['Retry', 'Retry', 'Retry', 'Retry'],
+          answer: 'Retry',
+          explanation: `There was an error fetching questions from the Gemini API.`
+        }]);
+      } finally {
         console.error('Error generating questions:', error);
         // Fallback to some default questions if API fails
         setQuestions([
@@ -51,6 +77,7 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
     };
 
     generateQuestions();
+  }, [questionCount, type, initialQuestions]);
   }, [questionCount, type]);
 
   if (loading) {
@@ -63,7 +90,7 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
   }
 
   const handleAnswerOptionClick = (option) => {
-    if (option === questions[currentQuestion].answer) {
+    if (questions[currentQuestion] && option === questions[currentQuestion].answer) {
       setScore(score + 10);
     }
 
@@ -72,10 +99,27 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
       setCurrentQuestion(nextQuestion);
     } else {
       setShowScore(true);
-      onGameComplete(score + (option === questions[currentQuestion].answer ? 10 : 0));
     }
   };
 
+  if (loading) {
+    return <div className="loading-text">Generating new questions from the Gemini API...</div>;
+  }
+
+  if (showScore || questions.length === 0) {
+    return (
+      <div className='score-section'>
+        <h2>You scored {score} out of {questions.length * 10}</h2>
+        <button onClick={() => window.location.reload()} className="btn secondary">Play Again</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className='quiz-container'>
+      <div className='question-section'>
+        <div className='question-count'>
+          <span>Question {currentQuestion + 1}</span>/{questions.length}
   if (!questions || questions.length === 0) {
       return (
       <div className="neon-card">
@@ -92,23 +136,17 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
         <div className="score-section">
           You scored {score} out of {questions.length * 10}
         </div>
-      ) : (
-        <>
-          <div className="question-section">
-            <div className="question-count">
-              <span>Question {currentQuestion + 1}</span>/{questions.length}
-            </div>
-            <div className="question-text">{questions[currentQuestion].question}</div>
-          </div>
-          <div className="answer-section">
-            {questions[currentQuestion].options.map((option, index) => (
-              <button key={index} onClick={() => handleAnswerOptionClick(option)} className="btn primary">
-                {option}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+        <div className='question-text'>{questions[currentQuestion]?.question}</div>
+      </div>
+      <div className='answer-section'>
+        {questions[currentQuestion]?.options.map((option, index) => (
+          <button key={index} onClick={() => handleAnswerOptionClick(option)} className="btn quiz-option">
+            {option}
+          </button>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default QuizGame;
