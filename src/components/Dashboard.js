@@ -21,6 +21,27 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    function onXpUpdated(e) {
+      const newXp = (e && e.detail && typeof e.detail.xp === 'number') ? e.detail.xp : getXp();
+      setXp(newXp);
+    }
+    function onXpCompleted(e) {
+      const last = e && e.detail && e.detail.lastCompleted;
+      if (last) {
+        setLastCompleted(last);
+        setOpen(true);
+        setTimeout(() => setOpen(false), 2600);
+      }
+    }
+    window.addEventListener('xpUpdated', onXpUpdated);
+    window.addEventListener('xpCompleted', onXpCompleted);
+    return () => {
+      window.removeEventListener('xpUpdated', onXpUpdated);
+      window.removeEventListener('xpCompleted', onXpCompleted);
+    };
+  }, []);
+
   // Updated quest completion handler
   function completeQuest({ title, xp: questXp, score }) {
     const totalXp = xp + (questXp || 0);
@@ -58,6 +79,14 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+      <div className="header-row">
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
+          <div className="feature-pill" style={{ cursor: 'pointer' }} onClick={() => navigate('/teacher-interaction')}>
+            ✔ Cute AI teachers
+          </div>
+        </div>
+      </div>
+
       <div className="left-panel">
         <div className="neon-card">
           <h3>🚀 Quests</h3>
@@ -77,38 +106,8 @@ export default function Dashboard() {
               <QuestCard title="More Quests" desc="Play a full quiz game and earn even more XP." onComplete={() => navigate('/quests')} />
             </div>
           </div>
-  useEffect(() => {
-    function onXpUpdated(e) {
-      const newXp = (e && e.detail && typeof e.detail.xp === 'number') ? e.detail.xp : getXp();
-      setXp(newXp);
-    }
-    function onXpCompleted(e) {
-      const last = e && e.detail && e.detail.lastCompleted;
-      if (last) {
-        setLastCompleted(last);
-        setOpen(true);
-        setTimeout(() => setOpen(false), 2600);
-      }
-    }
-    window.addEventListener('xpUpdated', onXpUpdated);
-    window.addEventListener('xpCompleted', onXpCompleted);
-    return () => {
-      window.removeEventListener('xpUpdated', onXpUpdated);
-      window.removeEventListener('xpCompleted', onXpCompleted);
-    };
-  }, []);
-
-  return (
-    <div className="dashboard">
-      <div className="header-row">
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
-          <div className="feature-pill" style={{ cursor: 'pointer' }} onClick={() => navigate('/teacher-interaction')}>
-            ✔ Cute AI teachers
-          </div>
         </div>
-      </div>
 
-      <div className="left-panel">
         <div className="neon-card glow">
           <h3>Core Idea</h3>
           <p className="small-muted">Embed learning into a story where AI NPCs create personalized quests, adapt difficulty, and give instant feedback.</p>

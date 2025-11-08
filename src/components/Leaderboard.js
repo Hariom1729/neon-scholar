@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
 const INITIAL_VISIBLE_USERS = 5;
 
