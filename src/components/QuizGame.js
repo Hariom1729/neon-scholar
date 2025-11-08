@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 
 export default function QuizGame({ questionCount = 5, type = 'game', duration, onGameComplete }) {
   const [questions, setQuestions] = useState([]);
@@ -27,7 +27,7 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
           default:
             prompt = `Generate ${questionCount} multiple choice questions about programming concepts. Format the response as a JSON array where each object has: question (string), options (array of 4 strings), and answer (string matching one of the options exactly). Make questions engaging and fun.`;
         }
-        const response = await generateGeminiResponse(prompt);
+        const response = await generateDeepSeekResponse(prompt, 'deepseek-chat');
         const parsedQuestions = JSON.parse(response);
         setQuestions(parsedQuestions);
         setLoading(false);

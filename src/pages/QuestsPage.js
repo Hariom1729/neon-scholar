@@ -59,7 +59,7 @@ export default function QuestsPage() {
     <div>
       <Dashboard />
       <div style={{ padding: '20px' }}>
-        <div className="quests-grid">
+          <div className="quests-grid">
           {quests.map((quest, index) => (
             <div key={index} className="neon-card quest-card">
               <div className="quest-header">
@@ -67,28 +67,8 @@ export default function QuestsPage() {
                 <h3>{quest.title}</h3>
               </div>
               <p>{quest.description}</p>
-              <div className="quest-footer">
-                <button
-                  className="neon-button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate(quest.route);
-                  }}
-                >
-                  Start Quest
-                </button>
-                <button
-                  className="neon-button outline"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Just close or minimize for now
-                  }}
-                >
-                  Later ⏳
-                </button>
-              </div>
             </div>
-          ))}
+          ))} 
         </div>
         <div style={{ marginTop: 24 }}>
           <Leaderboard leaderboardData={leaderboardData} />

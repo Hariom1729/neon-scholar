@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './pages.css';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 import StudentResponse from '../components/StudentResponse';
 
 export default function CodeCoachPage() {
@@ -21,7 +21,7 @@ export default function CodeCoachPage() {
     setTutorial('');
     try {
       const prompt = `Create an interactive coding tutorial for the project/topic: "${topic}" using ${language}. Include a brief explanation, step-by-step instructions (3 steps), an example code snippet, and two practice exercises. Return as plain text.`;
-      const text = await generateGeminiResponse(prompt);
+      const text = await generateDeepSeekResponse(prompt, 'deepseek-chat');
       setTutorial(text || 'No tutorial generated.');
     } catch (error) {
       console.error('Tutorial generation error:', error);

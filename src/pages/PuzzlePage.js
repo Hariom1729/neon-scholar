@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 import { addXp } from '../utils/xp';
 
 export default function PuzzlePage() {
@@ -31,7 +31,7 @@ export default function PuzzlePage() {
       }
       Make it engaging and educational. Focus on logic, algorithms, or data structures.`;
 
-      const response = await generateGeminiResponse(prompt);
+      const response = await generateDeepSeekResponse(prompt, 'deepseek-chat');
       const parsedPuzzle = JSON.parse(response);
       setPuzzle(parsedPuzzle);
     } catch (error) {

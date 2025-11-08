@@ -2,8 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import './ui.css';
-
-const GEMINI_MODEL = 'gemini-pro';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 
 // Function to simulate video generation using Neo3
 const generateVideo = async (text) => {
@@ -17,71 +16,6 @@ const generateVideo = async (text) => {
   });
 };
 
-// Function to generate text using Gemini API
-const generateGeminiResponse = async (prompt, apiKey) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-
-  const requestBody = {
-    contents: [{
-      parts: [{
-        text: prompt
-      }]
-    }],
-    // Add safety settings to reduce the chance of prompts being blocked
-    safetySettings: [
-      {
-        category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_ONLY_HIGH",
-      },
-      {
-        category: "HARM_CATEGORY_HATE_SPEECH",
-        threshold: "BLOCK_ONLY_HIGH",
-      },
-      {
-        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        threshold: "BLOCK_ONLY_HIGH",
-      },
-      {
-        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-        threshold: "BLOCK_ONLY_HIGH",
-      },
-    ],
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const errorDetails = data.error ? `Details: ${data.error.message}` : 'No additional details available.';
-      throw new Error(`HTTP error! status: ${response.status}. ${errorDetails}`);
-    }
-
-    if (data.promptFeedback && data.promptFeedback.blockReason) {
-      return `Your prompt was blocked for the following reason: ${data.promptFeedback.blockReason}. Please adjust your prompt and try again.`
-    }
-
-    if (!data.candidates || data.candidates.length === 0) {
-      return "The model did not return any content. This can happen for safety reasons or if the prompt is empty. Please try a different prompt.";
-    }
-
-    const text = data.candidates[0].content.parts[0].text;
-    return text;
-
-  } catch (error) {
-    console.error("Error generating response from Gemini:", error);
-    return `An error occurred while communicating with the API: ${error.message}`;
-  }
-};
-
-
 export default function TeacherInteraction() {
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
@@ -91,21 +25,21 @@ export default function TeacherInteraction() {
 
   const debouncedSubmit = useCallback(
     debounce(async (currentPrompt) => {
-      const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+      const apiKey = process.env.REACT_APP_DEEPSEEK_API_KEY;
 
       if (!apiKey) {
-        setResponse("API key not found. Please ensure you have set up your .env file with REACT_APP_GEMINI_API_KEY.");
+        setResponse("API key not found. Please ensure you have set up your .env file with REACT_APP_DEEPSEEK_API_KEY.");
         setIsLoading(false);
         return;
       }
 
       try {
-        const geminiResponse = await generateGeminiResponse(currentPrompt, apiKey);
-        setResponse(geminiResponse);
+        const deepseekResponse = await generateDeepSeekResponse(currentPrompt, 'deepseek-chat');
+        setResponse(deepseekResponse);
 
         // Only generate a video if the response was successful
-        if (!geminiResponse.startsWith("An error occurred") && !geminiResponse.startsWith("Your prompt was blocked")) {
-          const generatedVideoUrl = await generateVideo(geminiResponse);
+        if (!deepseekResponse.startsWith("An error occurred") && !deepseekResponse.startsWith("Your prompt was blocked")) {
+          const generatedVideoUrl = await generateVideo(deepseekResponse);
           setVideoUrl(generatedVideoUrl);
         }
 

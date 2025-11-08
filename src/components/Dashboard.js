@@ -112,9 +112,18 @@ export default function Dashboard() {
         <div className="neon-card">
           <h3>Quests</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {quests.map((q, i) => (
-              <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} questions={q.title.includes('Mini Puzzle') ? miniPuzzleQuestions : undefined} />
-            ))}
+            {quests.map((q, i) => {
+              if (q.title.includes('Mini Puzzle')) {
+                return (
+                  <div key={i} onClick={() => navigate('/puzzle')} style={{ cursor: 'pointer' }}>
+                    <QuestCard title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} questions={miniPuzzleQuestions} />
+                  </div>
+                )
+              }
+              return (
+                <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} />
+              )
+            })}
             <div onClick={() => navigate('/quests')} style={{ cursor: 'pointer' }}>
               <QuestCard title="Game Quests" desc="Play a quiz and earn XP to climb the leaderboard." onComplete={() => { }} />
             </div>

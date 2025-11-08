@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './pages.css';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 import StudentResponse from '../components/StudentResponse';
 
 export default function StoryGuidePage() {
@@ -21,7 +21,7 @@ export default function StoryGuidePage() {
     setStoryOutline('');
     try {
       const prompt = `Create a detailed story outline for the idea: "${storyPrompt}" in the ${genre} genre. Include a 3-5 sentence synopsis, chapter breakdown with 3 chapters, and three specific writing prompts for the student to continue the story. Return as plain text.`;
-      const text = await generateGeminiResponse(prompt);
+      const text = await generateDeepSeekResponse(prompt, 'deepseek-chat');
       setStoryOutline(text || 'No story generated.');
     } catch (error) {
       console.error('Story generation error:', error);

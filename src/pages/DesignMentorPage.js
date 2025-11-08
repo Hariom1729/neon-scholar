@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './pages.css';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 import StudentResponse from '../components/StudentResponse';
 
 export default function DesignMentorPage() {
@@ -21,7 +21,7 @@ export default function DesignMentorPage() {
     setDesign('');
     try {
       const prompt = `Create a practical design guide for the project: "${projectType}" with the style: ${style}. Include a suggested color palette, typography choices, a simple layout wireframe description, and three actionable next steps. Return as plain text.`;
-      const text = await generateGeminiResponse(prompt);
+      const text = await generateDeepSeekResponse(prompt, 'deepseek-chat');
       setDesign(text || 'No design generated.');
     } catch (error) {
       console.error('Design generation error:', error);

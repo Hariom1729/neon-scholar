@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './pages.css';
-import { generateGeminiResponse } from '../utils/gemini';
+import { generateDeepSeekResponse } from '../utils/deepseek';
 import StudentResponse from '../components/StudentResponse';
 
 export default function MathMentorPage() {
@@ -19,7 +19,7 @@ export default function MathMentorPage() {
     setVideoUrl('');
     try {
       const prompt = `Create a clear, step-by-step animated explainer script for the math topic: "${topic}". Include a short narrated explanation (3-6 sentences), a list of 4 animation scenes describing what should appear visually in each scene, and a short caption for each scene. Return the result as plain text.`;
-      const text = await generateGeminiResponse(prompt);
+      const text = await generateDeepSeekResponse(prompt, 'deepseek-chat');
       // For now we display the text explanation + animation guidance. Video URL generation not implemented here.
       setExplanation(text || `Explanation for ${topic} (no content returned).`);
       // Optionally keep a placeholder video or integration later
