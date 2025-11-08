@@ -4,6 +4,8 @@ const INITIAL_VISIBLE_USERS = 5;
 
 export default function Leaderboard({ currentUser }) {
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const [quizLeaderboardData, setQuizLeaderboardData] = useState([]);
+  const [showQuizLeaderboard, setShowQuizLeaderboard] = useState(false);
   const [visibleUsers, setVisibleUsers] = useState(INITIAL_VISIBLE_USERS);
 
   useEffect(() => {
@@ -21,10 +23,44 @@ export default function Leaderboard({ currentUser }) {
     };
 
     fetchUsers();
+    // The original query was: query(collection(db, "users"), orderBy("xp", "desc"), orderBy("createdAt", "asc"))
+    // This composite query requires a special index in Firestore.
+    // We are simplifying it to a single orderBy to avoid the error.
+    const q = query(collection(db, "users"), orderBy("xp", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      setLeaderboardData(users);
+    }, (error) => {
+      console.error("Error fetching leaderboard data: ", error);
+    });
+
+    const quizQuery = query(collection(db, "quizScores"), orderBy("score", "desc"));
+    const quizUnsubscribe = onSnapshot(quizQuery, (querySnapshot) => {
+      const quizUsers = [];
+      querySnapshot.forEach((doc) => {
+        quizUsers.push({ id: doc.id, ...doc.data() });
+      });
+      setQuizLeaderboardData(quizUsers);
+    }, (error) => {
+      console.error("Error fetching quiz leaderboard data: ", error);
+    });
+
+    return () => {
+      unsubscribe();
+      quizUnsubscribe();
+    };
   }, []);
 
+  useEffect(() => {
+    setVisibleUsers(INITIAL_VISIBLE_USERS);
+  }, [showQuizLeaderboard]);
+
   const showAllUsers = () => {
-    setVisibleUsers(leaderboardData.length);
+    const dataLength = showQuizLeaderboard ? quizLeaderboardData.length : leaderboardData.length;
+    setVisibleUsers(dataLength);
   };
 
   const getRankStyle = (index) => {
@@ -46,16 +82,19 @@ export default function Leaderboard({ currentUser }) {
   };
 
   const currentUserId = currentUser ? currentUser.uid : null;
+  const dataToDisplay = showQuizLeaderboard ? quizLeaderboardData : leaderboardData;
 
   return (
     <div className="neon-card glow">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h4 style={{ margin: 0 }}>Live Leaderboard</h4>
-        <div className="small-muted">Updates in real-time</div>
+        <h4 style={{ margin: 0 }}>{showQuizLeaderboard ? 'Live Quiz Leaderboard' : 'Live Leaderboard'}</h4>
+        <button className="btn ghost" onClick={() => setShowQuizLeaderboard(!showQuizLeaderboard)}>
+          {showQuizLeaderboard ? 'Show XP Leaderboard' : 'Show Quiz Leaderboard'}
+        </button>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {leaderboardData.slice(0, visibleUsers).map((user, index) => (
+        {dataToDisplay.slice(0, visibleUsers).map((user, index) => (
           <div
             key={user._id} 
             style={{
@@ -73,7 +112,6 @@ export default function Leaderboard({ currentUser }) {
               transition: 'all 0.3s ease'
             }}
           >
-            {/* Rank */}
             <div style={{
               width: '24px',
               fontWeight: 'bold',
@@ -82,13 +120,12 @@ export default function Leaderboard({ currentUser }) {
               {getPositionEmoji(index) || `#${index + 1}`}
             </div>
 
-            {/* Name and streak */}
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: '600' }}>{user.name}</div>
               <div className="small-muted">🔥 {user.streak || 0} day streak</div>
+              {!showQuizLeaderboard && <div className="small-muted">🔥 {user.streak} day streak</div>}
             </div>
 
-            {/* XP */}
             <div style={{
               fontWeight: '600',
               color: 'var(--neon-2)',
@@ -96,15 +133,14 @@ export default function Leaderboard({ currentUser }) {
               alignItems: 'center',
               gap: '4px'
             }}>
-              <span style={{ fontSize: '12px' }}>XP</span>
-              {user.xp}
+              <span style={{ fontSize: '12px' }}>{showQuizLeaderboard ? 'Score' : 'XP'}</span>
+              {showQuizLeaderboard ? user.score : user.xp}
             </div>
           </div>
         ))}
       </div>
 
-      {/* View All Button */}
-      {leaderboardData.length > visibleUsers && (
+      {dataToDisplay.length > visibleUsers && (
         <button
           className="btn ghost"
           style={{ width: '100%', marginTop: '12px' }}

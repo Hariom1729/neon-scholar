@@ -58,12 +58,36 @@ const QuizGame = ({ questionCount, type, initialQuestions }) => {
           explanation: `There was an error fetching questions from the Gemini API.`
         }]);
       } finally {
+        console.error('Error generating questions:', error);
+        // Fallback to some default questions if API fails
+        setQuestions([
+          {
+            question: "What is the most common way to handle asynchronous operations in modern JavaScript?",
+            options: ["Callbacks", "Promises", "async/await", "setTimeout"],
+            answer: "async/await"
+          },
+          {
+            question: "What does HTML stand for?",
+            options: ["HyperText Markup Language", "High-Level Text Machine Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"],
+            answer: "HyperText Markup Language"
+          }
+        ]);
         setLoading(false);
       }
     };
 
     generateQuestions();
   }, [questionCount, type, initialQuestions]);
+  }, [questionCount, type]);
+
+  if (loading) {
+    return (
+      <div className="neon-card">
+        <h3>🤖 Generating Your Quiz...</h3>
+        <p>The AI is crafting some interesting questions for you!</p>
+      </div>
+    );
+  }
 
   const handleAnswerOptionClick = (option) => {
     if (questions[currentQuestion] && option === questions[currentQuestion].answer) {
@@ -96,6 +120,21 @@ const QuizGame = ({ questionCount, type, initialQuestions }) => {
       <div className='question-section'>
         <div className='question-count'>
           <span>Question {currentQuestion + 1}</span>/{questions.length}
+  if (!questions || questions.length === 0) {
+      return (
+      <div className="neon-card">
+        <h3>Error</h3>
+        <p>Could not load questions.</p>
+      </div>
+      )
+  }
+
+  return (
+    <div className="neon-card">
+      <h3>{type.charAt(0).toUpperCase() + type.slice(1)} Quiz</h3>
+      {showScore ? (
+        <div className="score-section">
+          You scored {score} out of {questions.length * 10}
         </div>
         <div className='question-text'>{questions[currentQuestion]?.question}</div>
       </div>

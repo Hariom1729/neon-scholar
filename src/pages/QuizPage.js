@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import QuizGame from '../components/QuizGame';
 
 export default function QuizPage() {
@@ -14,6 +16,18 @@ export default function QuizPage() {
   if (gameId > 0) {
     return <QuizGame key={gameId} questionCount={questionCount} type="game" />;
   }
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const quizType = searchParams.get('type') || 'javascript';
+
+  const handleGameComplete = (score) => {
+    console.log('Quiz complete! Score:', score);
+    addXp(score);
+    navigate('/quests');
+  };
+
+  const questionCount = quizType === 'flash' ? 10 : 5;
 
   // Otherwise, show the selection screen
   return (
@@ -28,6 +42,13 @@ export default function QuizPage() {
           <button className="btn primary large" onClick={() => startQuiz(15)}>15 Questions</button>
         </div>
       </div>
+    <div style={{ padding: 20, maxWidth: 800, margin: 'auto' }}>
+      <QuizGame 
+        key={quizType} 
+        topic={quizType} 
+        questionCount={questionCount}
+        onGameComplete={handleGameComplete} 
+      />
     </div>
   );
 }
