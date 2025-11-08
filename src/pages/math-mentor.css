@@ -1,0 +1,115 @@
+.math-mentor {
+  grid-template-columns: 1fr !important;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.teacher-header-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,255,255,0.03);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.emoji-avatar {
+  font-size: 32px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border-radius: 16px;
+}
+
+.subtitle {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.input-section {
+  margin-bottom: 24px;
+}
+
+.topic-input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  margin: 12px 0;
+}
+
+.topic-input:focus {
+  outline: none;
+  border-color: var(--neon-1);
+  box-shadow: 0 0 0 2px rgba(var(--neon-1-rgb), 0.2);
+}
+
+.generate-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.suggestions {
+  margin-top: 24px;
+}
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip {
+  font-size: 14px;
+  padding: 6px 12px;
+}
+
+.video-section {
+  min-height: 300px;
+}
+
+.video-container {
+  margin: 20px 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.video-container video {
+  width: 100%;
+  display: block;
+}
+
+.loading-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 16px;
+}
+
+.emoji-spin {
+  font-size: 32px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.explanation {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  font-style: italic;
+}
