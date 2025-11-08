@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-HrWLQv00dI8YeNqtXjQgccANRlH3e0c",
-  authDomain: "studio-2923382865-6a26f.firebaseapp.com",
-  projectId: "studio-2923382865-6a26f",
-  storageBucket: "studio-2923382865-6a26f.firebasestorage.app",
-  messagingSenderId: "613828273307",
-  appId: "1:613828273307:web:bdbde31d2678044fa8523e"
+  apiKey: "AIzaSyA2NzuxN04ATADSi4nuRsmkwWRiy9nYLFk",
+  authDomain: "nextgensde-sihah.firebaseapp.com",
+  projectId: "nextgensde-sihah",
+  storageBucket: "nextgensde-sihah.firebasestorage.app",
+  messagingSenderId: "272842022438",
+  appId: "1:272842022438:web:580d41afc6d1eff14f90e7"
 };
 
 const app = initializeApp(firebaseConfig);
