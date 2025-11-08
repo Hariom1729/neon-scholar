@@ -1,0 +1,12 @@
+.mentorship-page {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.student-section, .teacher-section {
+  width: 45%;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+}

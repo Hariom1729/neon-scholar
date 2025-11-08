@@ -42,7 +42,7 @@ export default function TitleBar() {
       top: 0,
       left: 0,
       right: 0,
-      zIndex: 100,
+      zIndex: 10,
       background: 'rgba(15,23,42,0.8)',
       backdropFilter: 'blur(12px)',
       borderBottom: '1px solid rgba(255,255,255,0.06)',

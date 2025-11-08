@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { generateDeepSeekResponse } from '../utils/deepseek';
 
@@ -12,6 +11,7 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
 
   useEffect(() => {
     const generateQuestions = async () => {
+      setLoading(true);
       try {
         let prompt;
         switch (type) {
@@ -39,6 +39,11 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
             question: "What is the most common way to handle asynchronous operations in modern JavaScript?",
             options: ["Callbacks", "Promises", "async/await", "setTimeout"],
             answer: "async/await"
+          },
+          {
+            question: "What does HTML stand for?",
+            options: ["HyperText Markup Language", "High-Level Text Machine Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"],
+            answer: "HyperText Markup Language"
           }
         ]);
         setLoading(false);
@@ -46,7 +51,7 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
     };
 
     generateQuestions();
-  }, [questionCount]);
+  }, [questionCount, type]);
 
   if (loading) {
     return (
@@ -71,9 +76,18 @@ export default function QuizGame({ questionCount = 5, type = 'game', duration, o
     }
   };
 
+  if (!questions || questions.length === 0) {
+      return (
+      <div className="neon-card">
+        <h3>Error</h3>
+        <p>Could not load questions.</p>
+      </div>
+      )
+  }
+
   return (
     <div className="neon-card">
-      <h3>JavaScript Quiz</h3>
+      <h3>{type.charAt(0).toUpperCase() + type.slice(1)} Quiz</h3>
       {showScore ? (
         <div className="score-section">
           You scored {score} out of {questions.length * 10}

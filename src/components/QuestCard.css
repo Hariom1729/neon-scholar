@@ -1,3 +1,4 @@
+
 .quests-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -6,15 +7,10 @@
 }
 
 .quest-card {
-  cursor: pointer;
   transition: transform 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.quest-card:hover {
-  transform: translateY(-5px);
 }
 
 .quest-header {

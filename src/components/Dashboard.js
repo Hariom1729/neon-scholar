@@ -26,16 +26,6 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, []);
 
-  function completeQuest(q) {
-    setLastCompleted(q.title);
-    setOpen(true);
-    setTimeout(() => setOpen(false), 2600);
-  }
-
-  function addXp(amount) {
-    setXp(prev => prev + amount);
-  }
-
   useEffect(() => {
     function onXpUpdated(e) {
       const newXp = (e && e.detail && typeof e.detail.xp === 'number') ? e.detail.xp : getXp();
@@ -57,34 +47,10 @@ export default function Dashboard() {
     };
   }, []);
 
-  const quests = [
-    { title: 'Mini Puzzle — 5 mins', desc: 'Solve the neon sudoku to unlock a badge.' },
-    { title: 'Micro Project — 12 mins', desc: 'Create a tiny app using templates.' },
-    { title: 'Flash Learning — 3 mins', desc: 'Quick Q&A for dopamine hits.' }
-  ];
-
-  const miniPuzzleQuestions = [
-    {
-      id: 1,
-      prompt: 'What number is missing in the sequence: 2, 4, 6, __, 10?',
-      choices: ['7', '8', '9', '6'],
-      answerIndex: 1,
-      xp: 10
-    },
-    {
-      id: 2,
-      prompt: 'Which shape has 4 equal sides?',
-      choices: ['Triangle', 'Square', 'Circle', 'Rectangle'],
-      answerIndex: 1,
-      xp: 8
-    }
-  ];
-
   return (
     <div className="dashboard">
       <div className="header-row">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
-
           <div className="feature-pill" style={{ cursor: 'pointer' }} onClick={() => navigate('/teacher-interaction')}>
             ✔ Cute AI teachers
           </div>
@@ -100,13 +66,13 @@ export default function Dashboard() {
               <strong>AI NPC Teacher Types</strong>
               <p className="small-muted">Mentors, Story Guides, Code Coaches — each with cute reactions and tailored lessons.</p>
             </div>
-            <div className="neon-card">
-              <strong>1v2 Mentorship</strong>
+            <div className="neon-card" onClick={() => navigate('/mentorship')} style={{ cursor: 'pointer' }}>
+              <strong>1v1 Mentorship</strong>
               <p className="small-muted">Get guidance from two mentors at once.</p>
             </div>
-            <div className="neon-card">
-              <strong>Quest System</strong>
-              <p className="small-muted">Short missions, rewards, branching story progress.</p>
+            <div className="neon-card" onClick={() => navigate('/live-quiz')} style={{ cursor: 'pointer' }}>
+              <strong>Live Quiz Game</strong>
+              <p className="small-muted">Participate in a live quiz contest and see your name on the leaderboard.</p>
             </div>
             <div className="neon-card">
               <strong>Instant Feedback</strong>
@@ -115,27 +81,6 @@ export default function Dashboard() {
             <div className="neon-card">
               <strong>Emotional Gamification</strong>
               <p className="small-muted">Teachers empathize, celebrate wins, and adapt rewards.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="neon-card">
-          <h3>Quests</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {quests.map((q, i) => {
-              if (q.title.includes('Mini Puzzle')) {
-                return (
-                  <div key={i} onClick={() => navigate('/puzzle')} style={{ cursor: 'pointer' }}>
-                    <QuestCard title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} questions={miniPuzzleQuestions} />
-                  </div>
-                )
-              }
-              return (
-                <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} />
-              )
-            })}
-            <div onClick={() => navigate('/quests')} style={{ cursor: 'pointer' }}>
-              <QuestCard title="Game Quests" desc="Play a quiz and earn XP to climb the leaderboard." onComplete={() => { }} />
             </div>
           </div>
         </div>

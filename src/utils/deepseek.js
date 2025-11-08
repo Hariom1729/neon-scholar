@@ -1,42 +1,30 @@
-// Lightweight DeepSeek helper for generating text content.
-// Uses REACT_APP_DEEPSEEK_API_KEY from env. Returns the model's text output.
-export async function generateDeepSeekResponse(prompt, model = 'deepseek-chat') {
-  const apiKey = process.env.REACT_APP_DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    throw new Error('REACT_APP_DEEPSEEK_API_KEY is not set in the environment.');
+import { OpenRouter } from '@openrouter/sdk';
+
+// IMPORTANT: Replace "YOUR_API_KEY" with your actual OpenRouter API key.
+// You can get a key from https://openrouter.ai/keys
+const openRouter = new OpenRouter({
+  apiKey: "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",
+  defaultHeaders: {
+    "HTTP-Referer": window.location.href,
+    "X-Title": "Neon Scholar",
+  },
+});
+
+/**
+ * Gets a completion from the OpenRouter API.
+ * @param {Array<{role: string, content: string}>} messages - The messages to send to the AI.
+ * @returns {Promise<string>} The AI's response.
+ */
+export const generateDeepSeekResponse = async (messages) => {
+  try {
+    const completion = await openRouter.chat.send({
+      model: 'openai/gpt-4o',
+      messages: messages,
+      stream: false,
+    });
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error("Error getting completion from OpenRouter:", error);
+    return "Sorry, I'm having trouble connecting to the AI. Please try again later.";
   }
-
-  const url = 'https://api.deepseek.com/chat/completions';
-
-  const requestBody = {
-    model: model,
-    messages: [
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-    temperature: 0.2,
-    max_tokens: 512,
-  };
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    const errMsg = data.error?.message || 'Unknown API error';
-    throw new Error(`DeepSeek API error: ${errMsg}`);
-  }
-
-  if (!data.choices || data.choices.length === 0) return '';
-  const text = data.choices[0].message?.content || '';
-  return text;
-}
+};

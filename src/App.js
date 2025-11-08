@@ -19,6 +19,8 @@ import QuizPage from './pages/QuizPage';
 import PuzzlePage from './pages/PuzzlePage';
 import MicroProjectPage from './pages/MicroProjectPage';
 import TitleBar from './components/TitleBar';
+import LiveQuizPage from './pages/LiveQuizPage';
+import MentorshipPage from './pages/MentorshipPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -99,6 +101,8 @@ function App() {
             <Route path="/code-coach" element={<CodeCoachPage />} />
             <Route path="/design-mentor" element={<DesignMentorPage />} />
             <Route path="/micro-project" element={<MicroProjectPage />} />
+            <Route path="/live-quiz" element={<LiveQuizPage />} />
+            <Route path="/mentorship" element={<MentorshipPage />} />
           </Routes>
         </div>
       </div>
