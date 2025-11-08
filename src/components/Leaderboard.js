@@ -1,26 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-export default function Leaderboard({ currentUserId = '1' }) {
-  // In a real app, this would come from an API
-  const [leaderboardData, setLeaderboardData] = useState([
-    { id: '1', name: 'Alex', xp: 420, streak: 7, avatar: '👨‍🎓' },
-    { id: '2', name: 'Maria', xp: 385, streak: 5, avatar: '👩‍🎓' },
-    { id: '3', name: 'James', xp: 350, streak: 4, avatar: '👨‍🎓' },
-    { id: '4', name: 'Sarah', xp: 325, streak: 3, avatar: '👩‍🎓' },
-    { id: '5', name: 'Mike', xp: 310, streak: 2, avatar: '👨‍🎓' }
-  ]);
-
-  // Mock live updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLeaderboardData(prev => prev.map(user => ({
-        ...user,
-        xp: user.xp + (Math.random() > 0.7 ? Math.floor(Math.random() * 10) : 0)
-      })).sort((a, b) => b.xp - a.xp));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+export default function Leaderboard({ leaderboardData = [], currentUserId = '1' }) {
 
   const getRankStyle = (index) => {
     switch (index) {
@@ -44,7 +24,6 @@ export default function Leaderboard({ currentUserId = '1' }) {
     <div className="neon-card glow">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <h4 style={{ margin: 0 }}>Live Leaderboard</h4>
-        <div className="small-muted">Updates every 5s</div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

@@ -20,7 +20,8 @@ export default function Dashboard() {
   const teachers = [
     { name: 'Milo', role: 'Math Mentor', emoji: '🧠' },
     { name: 'Ava', role: 'Story Guide', emoji: '🪄' },
-    { name: 'Neo', role: 'Code Coach', emoji: '🤖' }
+    { name: 'Neo', role: 'Code Coach', emoji: '🤖' },
+    { name: 'Zoe', role: 'Design Mentor', emoji: '🎨' }
   ];
 
   const quests = [
@@ -50,6 +51,10 @@ export default function Dashboard() {
               <p className="small-muted">Mentors, Story Guides, Code Coaches — each with cute reactions and tailored lessons.</p>
             </div>
             <div className="neon-card">
+              <strong>1v2 Mentorship</strong>
+              <p className="small-muted">Get guidance from two mentors at once.</p>
+            </div>
+            <div className="neon-card">
               <strong>Quest System</strong>
               <p className="small-muted">Short missions, rewards, branching story progress.</p>
             </div>
@@ -70,6 +75,9 @@ export default function Dashboard() {
             {quests.map((q, i) => (
               <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} />
             ))}
+            <div onClick={() => navigate('/quests')} style={{ cursor: 'pointer' }}>
+              <QuestCard title="Game Quests" desc="Play a quiz and earn XP to climb the leaderboard." onComplete={() => {}} />
+            </div>
           </div>
         </div>
 
