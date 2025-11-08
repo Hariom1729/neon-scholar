@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { auth, db } from './firebase';
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import './App.css';
 import './components/ui.css';
 import Dashboard from './components/Dashboard';
@@ -18,6 +21,26 @@ import TitleBar from './components/TitleBar';
 import AchievementsFooter from './components/AchievementsFooter';
 
 function App() {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) {
+          // Add new user to Firestore
+          setDoc(userRef, {
+            name: currentUser.displayName || 'New User',
+            xp: 0,
+            streak: 0,
+            avatar: currentUser.photoURL || '👨‍🎓',
+            createdAt: serverTimestamp()
+          });
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="App neon-bg">

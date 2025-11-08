@@ -6,6 +6,8 @@ import FeedbackModal from './FeedbackModal';
 import StreakCard from './StreakCard';
 import Leaderboard from './Leaderboard';
 import { getXp } from '../utils/xp';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -15,6 +17,14 @@ export default function Dashboard() {
     const stored = getXp();
     return stored || 420;
   });
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   function completeQuest(q) {
     setLastCompleted(q.title);
@@ -131,7 +141,7 @@ export default function Dashboard() {
           </ul>
         </div>
 
-        <Leaderboard />
+        <Leaderboard currentUser={currentUser} />
       </div>
 
       <aside className="right-panel">
