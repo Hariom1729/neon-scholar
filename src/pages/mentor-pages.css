@@ -1,0 +1,64 @@
+.story-guide .story-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.genre-chips,
+.language-chips,
+.style-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.story-outline,
+.code-preview,
+.design-preview {
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  padding: 16px;
+  white-space: pre-wrap;
+  font-family: monospace;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.suggestion-list .btn {
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.genre-selection,
+.language-selection,
+.style-selection {
+  margin: 16px 0;
+}
+
+.output-section {
+  margin-top: 24px;
+}
+
+.tutorial-content,
+.design-guide {
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 16px;
+}

@@ -1,0 +1,52 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.teacher-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teacher-header {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 12px;
+}
+
+.teacher-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.specialties ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.specialties li {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 0 8px 8px 0;
+  font-size: 14px;
+}
+
+.catchphrase {
+  color: var(--neon-1);
+  font-size: 15px;
+  margin-top: auto;
+  padding-top: 12px;
+}

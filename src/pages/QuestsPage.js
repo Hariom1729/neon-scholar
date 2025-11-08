@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Dashboard from '../components/Dashboard';
 import AchievementsFooter from '../components/AchievementsFooter';
-import QuizGame from '../components/QuizGame';
 import Leaderboard from '../components/Leaderboard';
+import './QuestsPage.css';
 
 export default function QuestsPage() {
+  const navigate = useNavigate();
   const [leaderboardData, setLeaderboardData] = useState([
     { id: '1', name: 'Alex', xp: 420, streak: 7, avatar: '👨‍🎓' },
     { id: '2', name: 'Maria', xp: 385, streak: 5, avatar: '👩‍🎓' },
@@ -13,21 +15,81 @@ export default function QuestsPage() {
     { id: '5', name: 'Mike', xp: 310, streak: 2, avatar: '👨‍🎓' }
   ]);
 
-  const handleGameComplete = (score) => {
-    const newLeaderboardData = leaderboardData.map(user => {
-      if (user.id === '1') { // Assuming the current user is Alex
-        return { ...user, xp: user.xp + score };
-      }
-      return user;
-    });
-    setLeaderboardData(newLeaderboardData.sort((a, b) => b.xp - a.xp));
+  const handleQuestClick = (quest) => {
+    console.log('Quest clicked:', quest);
+    if (quest.type === 'puzzle') {
+      navigate('/puzzle');
+    } else {
+      navigate(`/quiz?type=${quest.type}${quest.duration ? `&duration=${quest.duration}` : ''}`);
+    }
   };
+
+  const quests = [
+    {
+      title: "Mini Puzzle — 5 mins",
+      description: "Solve programming puzzles to unlock a badge",
+      type: "puzzle",
+      icon: "🧩",
+      duration: 5
+    },
+    {
+      title: "Micro Project — 12 mins",
+      description: "Create a tiny app using templates",
+      type: "project",
+      icon: "🛠️",
+      duration: 12
+    },
+    {
+      title: "Flash Learning — 3 mins",
+      description: "Quick Q&A for dopamine hits",
+      type: "flash",
+      icon: "⚡",
+      duration: 3
+    },
+    {
+      title: "Game Quests",
+      description: "Play a quiz and earn XP to climb the leaderboard",
+      type: "game",
+      icon: "🎮",
+      route: "/quiz?type=game"
+    }
+  ];
 
   return (
     <div>
       <Dashboard />
       <div style={{ padding: '20px' }}>
-        <QuizGame onGameComplete={handleGameComplete} />
+        <div className="quests-grid">
+          {quests.map((quest, index) => (
+            <div key={index} className="neon-card quest-card">
+              <div className="quest-header">
+                <span className="quest-icon">{quest.icon}</span>
+                <h3>{quest.title}</h3>
+              </div>
+              <p>{quest.description}</p>
+              <div className="quest-footer">
+                <button
+                  className="neon-button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(quest.route);
+                  }}
+                >
+                  Start Quest
+                </button>
+                <button
+                  className="neon-button outline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Just close or minimize for now
+                  }}
+                >
+                  Later ⏳
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
         <div style={{ marginTop: 24 }}>
           <Leaderboard leaderboardData={leaderboardData} />
         </div>

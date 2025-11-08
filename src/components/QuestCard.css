@@ -1,0 +1,44 @@
+.quests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.quest-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quest-card:hover {
+  transform: translateY(-5px);
+}
+
+.quest-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quest-icon {
+  font-size: 24px;
+}
+
+.quest-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.quest-footer button {
+  flex: 1;
+}
+
+.neon-button.outline {
+  background: transparent;
+  border: 2px solid var(--neon-color);
+  color: var(--neon-color);
+}

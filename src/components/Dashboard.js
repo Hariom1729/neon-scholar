@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NPCTeacher from './NPCTeacher';
 import QuestCard from './QuestCard';
 import FeedbackModal from './FeedbackModal';
 import StreakCard from './StreakCard';
 import Leaderboard from './Leaderboard';
+import { getXp } from '../utils/xp';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [lastCompleted, setLastCompleted] = useState(null);
+  const [xp, setXp] = useState(() => {
+    const stored = getXp();
+    return stored || 420;
+  });
 
   function completeQuest(q) {
     setLastCompleted(q.title);
@@ -17,17 +22,52 @@ export default function Dashboard() {
     setTimeout(() => setOpen(false), 2600);
   }
 
-  const teachers = [
-    { name: 'Milo', role: 'Math Mentor', emoji: '🧠' },
-    { name: 'Ava', role: 'Story Guide', emoji: '🪄' },
-    { name: 'Neo', role: 'Code Coach', emoji: '🤖' },
-    { name: 'Zoe', role: 'Design Mentor', emoji: '🎨' }
-  ];
+  function addXp(amount) {
+    setXp(prev => prev + amount);
+  }
+
+  useEffect(() => {
+    function onXpUpdated(e) {
+      const newXp = (e && e.detail && typeof e.detail.xp === 'number') ? e.detail.xp : getXp();
+      setXp(newXp);
+    }
+    function onXpCompleted(e) {
+      const last = e && e.detail && e.detail.lastCompleted;
+      if (last) {
+        setLastCompleted(last);
+        setOpen(true);
+        setTimeout(() => setOpen(false), 2600);
+      }
+    }
+    window.addEventListener('xpUpdated', onXpUpdated);
+    window.addEventListener('xpCompleted', onXpCompleted);
+    return () => {
+      window.removeEventListener('xpUpdated', onXpUpdated);
+      window.removeEventListener('xpCompleted', onXpCompleted);
+    };
+  }, []);
 
   const quests = [
     { title: 'Mini Puzzle — 5 mins', desc: 'Solve the neon sudoku to unlock a badge.' },
     { title: 'Micro Project — 12 mins', desc: 'Create a tiny app using templates.' },
     { title: 'Flash Learning — 3 mins', desc: 'Quick Q&A for dopamine hits.' }
+  ];
+
+  const miniPuzzleQuestions = [
+    {
+      id: 1,
+      prompt: 'What number is missing in the sequence: 2, 4, 6, __, 10?',
+      choices: ['7', '8', '9', '6'],
+      answerIndex: 1,
+      xp: 10
+    },
+    {
+      id: 2,
+      prompt: 'Which shape has 4 equal sides?',
+      choices: ['Triangle', 'Square', 'Circle', 'Rectangle'],
+      answerIndex: 1,
+      xp: 8
+    }
   ];
 
   return (
@@ -46,7 +86,7 @@ export default function Dashboard() {
           <h3>Core Idea</h3>
           <p className="small-muted">Embed learning into a story where AI NPCs create personalized quests, adapt difficulty, and give instant feedback.</p>
           <div style={{ marginTop: 12 }} className="grid-cards">
-            <div className="neon-card">
+            <div className="neon-card" onClick={() => navigate('/teacher-types')} style={{ cursor: 'pointer' }}>
               <strong>AI NPC Teacher Types</strong>
               <p className="small-muted">Mentors, Story Guides, Code Coaches — each with cute reactions and tailored lessons.</p>
             </div>
@@ -73,10 +113,10 @@ export default function Dashboard() {
           <h3>Quests</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {quests.map((q, i) => (
-              <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} />
+              <QuestCard key={i} title={q.title} desc={q.desc} onComplete={() => completeQuest(q)} addXp={addXp} questions={q.title.includes('Mini Puzzle') ? miniPuzzleQuestions : undefined} />
             ))}
             <div onClick={() => navigate('/quests')} style={{ cursor: 'pointer' }}>
-              <QuestCard title="Game Quests" desc="Play a quiz and earn XP to climb the leaderboard." onComplete={() => {}} />
+              <QuestCard title="Game Quests" desc="Play a quiz and earn XP to climb the leaderboard." onComplete={() => { }} />
             </div>
           </div>
         </div>
@@ -97,21 +137,12 @@ export default function Dashboard() {
       <aside className="right-panel">
         <StreakCard />
 
-        <div className="neon-card glow">
-          <h4>AI NPCs</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {teachers.map((t, idx) => (
-              <NPCTeacher key={idx} name={t.name} role={t.role} emoji={t.emoji} />
-            ))}
-          </div>
-        </div>
-
         <div className="neon-card">
           <h4>Progress</h4>
           <div style={{ height: 10, background: 'rgba(255,255,255,0.04)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ width: '42%', height: 10, background: 'linear-gradient(90deg,var(--neon-1),var(--neon-2))' }} />
           </div>
-          <div style={{ marginTop: 8 }} className="small-muted">Short missions completed: 3 • XP: 420</div>
+          <div style={{ marginTop: 8 }} className="small-muted">Short missions completed: 3 • XP: {xp}</div>
         </div>
 
         <div className="neon-card">

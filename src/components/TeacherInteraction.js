@@ -13,7 +13,7 @@ const generateVideo = async (text) => {
       const videoUrl = "https://example.com/generated-video.mp4";
       console.log(`Video generated: ${videoUrl}`);
       resolve(videoUrl);
-    }, 2000); 
+    }, 2000);
   });
 };
 
@@ -67,9 +67,9 @@ const generateGeminiResponse = async (prompt, apiKey) => {
     if (data.promptFeedback && data.promptFeedback.blockReason) {
       return `Your prompt was blocked for the following reason: ${data.promptFeedback.blockReason}. Please adjust your prompt and try again.`
     }
-    
+
     if (!data.candidates || data.candidates.length === 0) {
-        return "The model did not return any content. This can happen for safety reasons or if the prompt is empty. Please try a different prompt.";
+      return "The model did not return any content. This can happen for safety reasons or if the prompt is empty. Please try a different prompt.";
     }
 
     const text = data.candidates[0].content.parts[0].text;
@@ -94,9 +94,9 @@ export default function TeacherInteraction() {
       const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 
       if (!apiKey) {
-          setResponse("API key not found. Please ensure you have set up your .env file with REACT_APP_GEMINI_API_KEY.");
-          setIsLoading(false);
-          return;
+        setResponse("API key not found. Please ensure you have set up your .env file with REACT_APP_GEMINI_API_KEY.");
+        setIsLoading(false);
+        return;
       }
 
       try {
@@ -108,7 +108,7 @@ export default function TeacherInteraction() {
           const generatedVideoUrl = await generateVideo(geminiResponse);
           setVideoUrl(generatedVideoUrl);
         }
-        
+
       } catch (error) {
         console.error('Error in submission handler:', error);
         setResponse(`An unexpected error occurred: ${error.message}`)
