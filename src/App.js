@@ -14,6 +14,7 @@ import CodeCoachPage from './pages/CodeCoachPage';
 import DesignMentorPage from './pages/DesignMentorPage';
 import QuizPage from './pages/QuizPage';
 import PuzzlePage from './pages/PuzzlePage';
+import MicroProjectPage from './pages/MicroProjectPage';
 import TitleBar from './components/TitleBar';
 import AchievementsFooter from './components/AchievementsFooter';
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/puzzle" element={<PuzzlePage />} />
             <Route path="/code-coach" element={<CodeCoachPage />} />
             <Route path="/design-mentor" element={<DesignMentorPage />} />
+            <Route path="/micro-project" element={<MicroProjectPage />} />
           </Routes>
         </div>
       </div>

@@ -19,6 +19,8 @@ export default function QuestsPage() {
     console.log('Quest clicked:', quest);
     if (quest.type === 'puzzle') {
       navigate('/puzzle');
+    } else if (quest.type === 'project') {
+      navigate('/micro-project');
     } else {
       navigate(`/quiz?type=${quest.type}${quest.duration ? `&duration=${quest.duration}` : ''}`);
     }
@@ -61,7 +63,7 @@ export default function QuestsPage() {
       <div style={{ padding: '20px' }}>
           <div className="quests-grid">
           {quests.map((quest, index) => (
-            <div key={index} className="neon-card quest-card">
+            <div key={index} className="neon-card quest-card" onClick={() => handleQuestClick(quest)}>
               <div className="quest-header">
                 <span className="quest-icon">{quest.icon}</span>
                 <h3>{quest.title}</h3>
